@@ -5,7 +5,7 @@ set -euo pipefail
 
 # Define constants
 OUTPUT_DIR="/opt/blackscan/data/nmap"
-SCAN_OUTPUT="${OUTPUT_DIR}/full_scan"
+SCAN_OUTPUT="${OUTPUT_DIR}/results"
 
 # Ensure target is provided
 if [ -z "${blackscan:-}" ]; then
@@ -22,12 +22,12 @@ mkdir -p "$OUTPUT_DIR"
 # -p-: All ports
 # -T4: Aggressive timing
 # --min-rate 1000: Minimum rate of packets/sec
-# -oA: Output in all formats
+# -oG: Output in grepable format
 # --open: Only show open ports
 # -Pn: Skip host discovery
 nmap -sV -sC -p- -T4 \
     --min-rate 1000 \
-    -oA "$SCAN_OUTPUT" \
+    -oG "$SCAN_OUTPUT" \
     --open -Pn \
     --script=vuln,safe \
     "$blackscan"

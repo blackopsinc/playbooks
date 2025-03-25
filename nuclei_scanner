@@ -1,0 +1,38 @@
+#!/bin/bash
+
+# Create output directory
+mkdir -p /opt/blackscan/data/nuclei
+
+# Base configuration for all scans
+BASE_OPTS="-target $blackscan -silent -rate-limit 150 -c 50 -timeout 5"
+#BASE_OPTS="-target $blackscan -rate-limit 150 -c 50 -timeout 5"
+OUTPUT_DIR="/opt/blackscan/data/nuclei"
+TEMPLATE_DIR="/root/.local/nuclei-templates"
+
+
+# Critical/High/Medium severity CVEs
+nuclei $BASE_OPTS \
+  -severity critical,high,medium \
+  -templates $TEMPLATE_DIR/cves/ \
+  -o "$OUTPUT_DIR/cves"
+
+# Focused scans for specific categories
+# Security exposures
+nuclei $BASE_OPTS \
+  -templates $TEMPLATE_DIR/exposures/ \
+  -o "$OUTPUT_DIR/exposures"
+
+# Security vulnerabilities
+nuclei $BASE_OPTS \
+  -templates $TEMPLATE_DIR/vulnerabilities/ \
+  -o "$OUTPUT_DIR/vulnerabilities"
+
+# Security misconfigurations
+nuclei $BASE_OPTS \
+  -templates $TEMPLATE_DIR/misconfiguration/ \
+  -o "$OUTPUT_DIR/misconfiguration"
+
+# Technology detection
+nuclei $BASE_OPTS \
+  -templates $TEMPLATE_DIR/technologies/ \
+  -o "$OUTPUT_DIR/technologies"
