@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Set strict error handling
+set -euo pipefail
+
+# Define constants
+OUTPUT_DIR="/opt/blackscan/data/nmap"
+SCAN_OUTPUT="${OUTPUT_DIR}/full_scan"
+
+# Ensure target is provided
+if [ -z "${blackscan:-}" ]; then
+    echo "Error: No target specified in \$blackscan variable"
+    exit 1
+fi
+
+# Create output directory
+mkdir -p "$OUTPUT_DIR"
+
+# Perform comprehensive port scan
+# -sV: Version detection
+# -sC: Default script scan
+# -p-: All ports
+# -T4: Aggressive timing
+# --min-rate 1000: Minimum rate of packets/sec
+# -oA: Output in all formats
+# --open: Only show open ports
+# -Pn: Skip host discovery
+nmap -sV -sC -p- -T4 \
+    --min-rate 1000 \
+    -oA "$SCAN_OUTPUT" \
+    --open -Pn \
+    --script=vuln,safe \
+    "$blackscan"
