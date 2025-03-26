@@ -5,7 +5,6 @@ mkdir -p /opt/blackscan/data/nuclei
 
 # Base configuration for all scans
 BASE_OPTS="-target $blackscan -silent -rate-limit 150 -c 50 -timeout 5"
-#BASE_OPTS="-target $blackscan -rate-limit 150 -c 50 -timeout 5"
 OUTPUT_DIR="/opt/blackscan/data/nuclei"
 TEMPLATE_DIR="/root/.local/nuclei-templates"
 
